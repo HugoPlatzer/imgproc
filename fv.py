@@ -3,6 +3,15 @@ import pywt
 import numpy as np
 import os
 from sys import argv
+from glob import glob
+
+def readMapping(filename):
+	d = {}
+	with open(filename) as f:
+		for l in f.readlines():
+			lSplit = l.split(";")
+			d[lSplit[0]] = int(lSplit[1])
+	return d
 
 def convertColorspace(img, cs):
 	if cs == "rgb":
@@ -31,9 +40,15 @@ def procImg(filename, colorSpace, wavelet, nLevels):
 		fv += procChan(ic, wavelet, nLevels)
 	return fv
 
-def processFiles(dirname):
+def processPictures(mapping, dirname, patID):
 	for fn in os.listdir(dirname):
-		fv = procImg(os.path.join(dirname, fn), argv[2], argv[3], int(argv[4]))
-		print(" ".join(str(k) for k in fv))
+		fv = procImg(os.path.join(dirname, fn), argv[1], argv[2], int(argv[3]))
+		print("{} {} {}".format(patID, mapping[fn], " ".join(str(k) for k in fv)))
 
-processFiles(argv[1])
+imgDir = "img"
+mapping = readMapping(os.path.join(imgDir, "patientmapping.csv"))
+patMap = {"Pit Pattern I" : "A", "Pit Pattern II" : "B",
+"Pit Pattern III L" : "C", "Pit Pattern III S" : "D",
+"Pit Pattern IV" : "E", "Pit Pattern V" : "F"}
+for patDir, patID in patMap.iteritems():
+    processPictures(mapping, os.path.join(imgDir, patDir), patID)
