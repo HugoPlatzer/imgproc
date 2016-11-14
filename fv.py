@@ -1,9 +1,8 @@
 import cv2
 import pywt
 import numpy as np
+import os
 from sys import argv
-
-filename = "/home/hugo/proggen/bv/img/Pit Pattern I/AKH0008-cut-1294663804985.png"
 
 def convertColorspace(img, cs):
 	if cs == "rgb":
@@ -28,9 +27,13 @@ def procImg(filename, colorSpace, wavelet, nLevels):
 		ic = img[:,:,i]
 		clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 		ic = clahe.apply(ic)
-		ic = cv2.normalize(ic, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+		ic = cv2.normalize(ic, dst = ic, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
 		fv += procChan(ic, wavelet, nLevels)
 	return fv
 
-fv = procImg(argv[1], argv[2], argv[3], int(argv[4]))
-print(" ".join(str(k) for k in fv))
+def processFiles(dirname):
+	for fn in os.listdir(dirname):
+		fv = procImg(os.path.join(dirname, fn), argv[2], argv[3], int(argv[4]))
+		print(" ".join(str(k) for k in fv))
+
+processFiles(argv[1])
