@@ -1,6 +1,8 @@
 from random import uniform
 
 class Classifier:
+	k = 1
+
 	def __init__(self, fvData):
 		self.fvData = fvData
 		
@@ -8,14 +10,10 @@ class Classifier:
 		return sum((fvA[i] - fvB[i])**2 for i in xrange(len(fvA)))**0.5
 	
 	def classifyNN(self, fv):
-		bestDist, bestClass = None, None
-		for i, fd in enumerate(self.fvData):
-			dist = self.euclidDist(fv, fd[1])
-			if bestDist == None or dist < bestDist:
-				bestDist = dist
-				bestClass = fd[0]
-		return bestClass
-	
+		distClass = sorted((self.euclidDist(fv, d[1]), d[0])for d in self.fvData)
+		votes = [d[1] for d in distClass[:self.k]]
+		return max(votes, key = votes.count)
+
 	def classifyFake(self, fv):
 	    return "B"
 
