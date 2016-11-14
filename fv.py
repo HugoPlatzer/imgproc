@@ -47,8 +47,8 @@ def processPictures(mapping, dirname, patID):
 
 imgDir = "img"
 mapping = readMapping(os.path.join(imgDir, "patientmapping.csv"))
-patMap = {"Pit Pattern I" : "A", "Pit Pattern II" : "B",
-"Pit Pattern III L" : "C", "Pit Pattern III S" : "D",
-"Pit Pattern IV" : "E", "Pit Pattern V" : "F"}
+patMap = {"Pit Pattern I" : "A", "Pit Pattern II" : "A",
+"Pit Pattern III L" : "B", "Pit Pattern III S" : "B",
+"Pit Pattern IV" : "B", "Pit Pattern V" : "C"}
 for patDir, patID in patMap.iteritems():
     processPictures(mapping, os.path.join(imgDir, patDir), patID)
