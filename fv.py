@@ -20,13 +20,18 @@ def convertColorspace(img, cs):
 	return cv2.cvtColor(img, cs)
 
 def procChan(img, wavelet, nLevels):
-	wt = pywt.wavedec2(img, wavelet = wavelet, level = nLevels)
-	fv = []
-	for l in xrange(1, nLevels + 1):
-		for x in wt[l]:
-			fv.append(np.std(x))
-			fv.append(np.mean(np.abs(x - np.mean(x))))
-	return fv
+    wt = pywt.wavedec2(img, wavelet = wavelet, level = nLevels)
+    #print(len(wt))
+    fv = []
+    for l in xrange(1, nLevels):
+        #print("l = {}".format(l))
+        #print(len(wt[l]))
+        #print(len(wt[l][1]))
+        for x in wt[l]:
+            fv.append(np.std(x))
+            fv.append(np.mean(np.abs(x - np.mean(x))))
+    #print(len(fv))
+    return fv
 
 def procImg(filename, colorSpace, wavelet, nLevels):
 	img = cv2.imread(filename, cv2.IMREAD_COLOR)
