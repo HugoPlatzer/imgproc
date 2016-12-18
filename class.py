@@ -1,4 +1,5 @@
 from random import uniform
+from sys import argv
 
 
 class Classifier:
@@ -73,7 +74,7 @@ def printClasses(pd):
 
 
 pd = None
-with open("fv.txt") as f:
+with open(argv[1]) as f:
     pd = readFVFile(f)
     printClasses(pd)
     printResults(lopv(pd))
