@@ -9,12 +9,12 @@ f2 = int(argv[3])
 d1, d2 = [], []
 
 for l in stdin.readlines():
-	lSplit = l.split(" ")
-	if lSplit[0] != pClass:
-		continue
-	fv = [float(x) for x in lSplit[2:]]
-	d1.append(fv[f1])
-	d2.append(fv[f2])
-	
+    lSplit = l.split(" ")
+    if lSplit[0] != pClass:
+        continue
+    fv = [float(x) for x in lSplit[2:]]
+    d1.append(fv[f1])
+    d2.append(fv[f2])
+
 plt.scatter(d1, d2)
 plt.show()

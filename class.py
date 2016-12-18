@@ -1,45 +1,49 @@
 from random import uniform
 
+
 class Classifier:
-	k = 1
+    k = 1
 
-	def __init__(self, fvData):
-		self.fvData = fvData
-		
-	def euclidDist(self, fvA, fvB):
-		return sum((fvA[i] - fvB[i])**2 for i in xrange(len(fvA)))**0.5
-	
-	def classifyNN(self, fv):
-		distClass = sorted((self.euclidDist(fv, d[1]), d[0])for d in self.fvData)
-		votes = [d[1] for d in distClass[:self.k]]
-		return max(votes, key = votes.count)
+    def __init__(self, fvData):
+        self.fvData = fvData
 
-	def classifyFake(self, fv):
-	    return "B"
+    def euclidDist(self, fvA, fvB):
+        return sum((fvA[i] - fvB[i]) ** 2 for i in xrange(len(fvA))) ** 0.5
+
+    def classifyNN(self, fv):
+        distClass = sorted((self.euclidDist(fv, d[1]), d[0]) for d in self.fvData)
+        votes = [d[1] for d in distClass[:self.k]]
+        return max(votes, key=votes.count)
+
+    def classifyFake(self, fv):
+        return "B"
+
 
 def readFVFile(f):
-	patData = {}
-	for l in f.readlines():
-		lSplit = l.split(" ")
-		patClass = lSplit[0]
-		patID = int(lSplit[1])
-		patFV = [float(k) for k in lSplit[2:]]
-		if patID not in patData:
-		    patData[patID] = []
-		patData[patID].append((patClass, patFV))
-	return patData
+    patData = {}
+    for l in f.readlines():
+        lSplit = l.split(" ")
+        patClass = lSplit[0]
+        patID = int(lSplit[1])
+        patFV = [float(k) for k in lSplit[2:]]
+        if patID not in patData:
+            patData[patID] = []
+        patData[patID].append((patClass, patFV))
+    return patData
 
-#leave one picture out
+
+# leave one picture out
 def loov(patData):
     results = []
     fvFlat = [pp for pd in patData.values() for pp in pd]
     for i in xrange(len(fvFlat)):
-        fvOther = fvFlat[:i] + fvFlat[i+1:]
+        fvOther = fvFlat[:i] + fvFlat[i + 1:]
         c = Classifier(fvOther)
         results.append((c.classifyNN(fvFlat[i][1]), fvFlat[i][0]))
     return results
 
-#leave one patient out
+
+# leave one patient out
 def lopv(patData):
     results = []
     for patID, patRec in patData.iteritems():
@@ -48,6 +52,7 @@ def lopv(patData):
         for pr in patRec:
             results.append((c.classifyNN(pr[1]), pr[0]))
     return results
+
 
 def printResults(results):
     numCorrect, numTotal = {}, {}
@@ -61,9 +66,11 @@ def printResults(results):
     for c, r in numCorrect.iteritems():
         print("{}: {}/{}={}".format(c, r, numTotal[c], r / float(numTotal[c])))
 
+
 def printClasses(pd):
     for pr in pd.values():
         print(" ".join(pp[0] for pp in pr))
+
 
 pd = None
 with open("fv.txt") as f:
