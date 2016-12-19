@@ -21,16 +21,20 @@ class Classifier:
 
 
 def readFVFile(f):
-    patData = {}
-    for l in f.readlines():
-        lSplit = l.split(" ")
-        patClass = lSplit[0]
-        patID = int(lSplit[1])
-        patFV = [float(k) for k in lSplit[2:]]
-        if patID not in patData:
-            patData[patID] = []
-        patData[patID].append((patClass, patFV))
-    return patData
+    try:
+        patData = {}
+        for l in f.readlines():
+            lSplit = l.split(" ")
+            patClass = lSplit[0]
+            patID = int(lSplit[1])
+            patFV = [float(k) for k in lSplit[2:]]
+            if patID not in patData:
+                patData[patID] = []
+            patData[patID].append((patClass, patFV))
+        return patData
+    except(ValueError, AttributeError):
+        print "This Feature Vector file is not supported"
+        exit(1)
 
 
 # leave one picture out
