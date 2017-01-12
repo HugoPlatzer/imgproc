@@ -2,7 +2,7 @@ import cv2
 import pywt
 import numpy as np
 import os
-from sys import argv
+import argparse
 
 def loadPatientMapping(filename):
     d = {}
@@ -43,11 +43,18 @@ def procImg(filename, colorSpace, wavelet, nLevels):
     return fv
 
 
-def processPictures(patientMapping, imageDir, patternClass):
+def processPictures(patientMapping, imageDir, patternClass, args):
     for imageFileName in os.listdir(imageDir):
-        fv = procImg(os.path.join(imageDir, imageFileName), argv[1], argv[2], int(argv[3]))
+        fv = procImg(os.path.join(imageDir, imageFileName), args.colorSpace, args.waveletFunction, int(args.nLevels))
         print("{} {} {}".format(patternClass, patientMapping[imageFileName], " ".join(str(k) for k in fv)))
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument("transformType", choices = ["dwt", "swt"])
+parser.add_argument("colorSpace")
+parser.add_argument("waveletFunction")
+parser.add_argument("nLevels", type = int)
+args = parser.parse_args()
 
 dataDir = "img"
 patientMapping = loadPatientMapping(os.path.join(dataDir, "patientmapping.csv"))
@@ -55,4 +62,4 @@ patternClassMapping = {"Pit Pattern I": "A", "Pit Pattern II": "A",
           "Pit Pattern III L": "B", "Pit Pattern III S": "B",
           "Pit Pattern IV": "B", "Pit Pattern V": "C"}
 for patternDir, patternClass in patternClassMapping.iteritems():
-    processPictures(patientMapping, os.path.join(dataDir, patternDir), patternClass)
+    processPictures(patientMapping, os.path.join(dataDir, patternDir), patternClass, args)
