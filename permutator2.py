@@ -1,17 +1,32 @@
-import os
+import os, sys
 
-FVParams = {"transformType" : ["dwt", "swt"], "colorSpace" : ["rgb"], "waveletFunction" : ["db1", "db2"],
-"nLevels" : ["4"]}
-ClassifierParams = {"testMethod" :  ["picture"], "k" : [3]}
+FVParams = {"transformType" : ["dwt"],
+            "colorSpace" : ["rgb", "hsv", "lab"],
+            "waveletFunction" : ["db1", "db2"],
+            "nLevels" : ["4"]}
+            
+ClassifierParams = {"testMethod" :  ["picture"],
+                    "k" : [3]}
 
 FVFileName = "fv_auto.txt"
-FVCmdline = lambda params : "python fv.py {} {} {} {} > {}".format(
-        params["transformType"], params["colorSpace"], params["waveletFunction"],
-        params["nLevels"], FVFileName)
-ClassifierCmdline = lambda params : "python class.py {} {} < {}".format(
-        params["testMethod"],
-        params["k"]
-        FVFileName)
+
+
+
+def FVCmdline(pFV):
+    cmdline = "python fv.py {} {} {} {} > {}"
+    cmdline = cmdline.format(
+        pFV["transformType"], pFV["colorSpace"],
+        pFV["waveletFunction"],
+        pFV["nLevels"], FVFileName)
+    #print(cmdline)
+    return cmdline
+
+def classifierCmdline(pClass):
+    cmdline = "python class.py {} {} < {}"
+    cmdline = cmdline.format(pClass["testMethod"], 
+                             pClass["k"], FVFileName)
+    #print(cmdline)
+    return cmdline
 
 def runForCombinations(params, func):
     def _run(remainingParams, currParams):
@@ -25,13 +40,14 @@ def runForCombinations(params, func):
     
     _run(params.items(), {})
 
-def generateFV(params):
-    os.popen(FVCmdline(params))
+def runClassifier(pClass):
+    print("ClassifierParams: {}".format(str(pClass)))
+    print(os.popen(classifierCmdline(pClass)).read())
+    
 
-def classifyFV(params):
-    return os.popen(ClassifierCmdline(params))
+def runForFVParam(pFV):
+    print("FVParams: {}".format(str(pFV)))
+    os.popen(FVCmdline(pFV))
+    runForCombinations(ClassifierParams, runClassifier)
 
-def printOutput(pFV, pClass):
-    print("FVParams : {}".format(str(pFV)))
-    print("ClassifierParams : {}".format(str(pClass)))
-    print()
+runForCombinations(FVParams, runForFVParam)
