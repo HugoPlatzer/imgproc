@@ -83,7 +83,7 @@ def printResults(results):
                                     numTotal[patternClass], correctness))
     totalNCorrect = sum(1 for r in results if r.computedClass == r.correctClass)
     totalCorrectness = totalNCorrect / float(len(results))
-    print("Total: {}".format(totalCorrectness))
+    print("Total: {}/{}={}".format(totalNCorrect, len(results), totalCorrectness))
 
 testMethods = {"picture" : loov, "patient" : lopv}
 parser = argparse.ArgumentParser()
