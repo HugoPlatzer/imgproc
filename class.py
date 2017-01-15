@@ -77,13 +77,17 @@ def printResults(results):
         if r.computedClass == r.correctClass:
             numCorrect[r.correctClass] += 1
         numTotal[r.correctClass] += 1
+    avgCorrectness = 0.0
     for patternClass, nCorrect in sorted(numCorrect.iteritems()):
         correctness = numCorrect[patternClass] / float(numTotal[patternClass])
+        avgCorrectness += correctness
         print("{}: {}/{}={}".format(patternClass, nCorrect,
                                     numTotal[patternClass], correctness))
+    avgCorrectness /= len(numTotal)
     totalNCorrect = sum(1 for r in results if r.computedClass == r.correctClass)
     totalCorrectness = totalNCorrect / float(len(results))
     print("Total: {}/{}={}".format(totalNCorrect, len(results), totalCorrectness))
+    print("Average: {}".format(avgCorrectness))
 
 testMethods = {"picture" : loov, "patient" : lopv}
 parser = argparse.ArgumentParser()
