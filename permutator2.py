@@ -1,30 +1,27 @@
 import os, sys
+import argparse
 
 FVParams = {"transformType" : ["dwt"],
-            "colorSpace" : ["rgb", "hsv", "lab"],
-            "waveletFunction" : ["db1", "db2"],
-            "nLevels" : ["4"]}
+            "colorSpace" : ['Lab'],
+            "waveletFunction" : ['haar', 'db1', 'db10',  'db20', 'sym2', 'sym5', 'sym10', 'sym20', 'coif1', 'bior1.1', 'rbio1.1', 'dmey'],
+            "nLevels" : ["-1"]}
             
-ClassifierParams = {"testMethod" :  ["picture"],
-                    "k" : [3]}
-
-FVFileName = "fv_auto.txt"
-
-
+ClassifierParams = {"testMethod" :  ["patient"],
+                    "k" : [1]}
 
 def FVCmdline(pFV):
     cmdline = "python fv.py {} {} {} {} > {}"
     cmdline = cmdline.format(
         pFV["transformType"], pFV["colorSpace"],
         pFV["waveletFunction"],
-        pFV["nLevels"], FVFileName)
+        pFV["nLevels"], args.FVFile)
     #print(cmdline)
     return cmdline
 
 def classifierCmdline(pClass):
     cmdline = "python class.py {} {} < {}"
     cmdline = cmdline.format(pClass["testMethod"], 
-                             pClass["k"], FVFileName)
+                             pClass["k"], args.FVFile)
     #print(cmdline)
     return cmdline
 
@@ -42,12 +39,20 @@ def runForCombinations(params, func):
 
 def runClassifier(pClass):
     print("ClassifierParams: {}".format(str(pClass)))
+    sys.stderr.write(classifierCmdline(pClass) + "\n")
     print(os.popen(classifierCmdline(pClass)).read())
     
 
 def runForFVParam(pFV):
     print("FVParams: {}".format(str(pFV)))
+    sys.stderr.write(FVCmdline(pFV) + "\n")
     os.popen(FVCmdline(pFV))
     runForCombinations(ClassifierParams, runClassifier)
-
+    
+    
+parser = argparse.ArgumentParser()
+parser.add_argument("paramFile")
+parser.add_argument("FVFile")
+args = parser.parse_args()
+execfile(args.paramFile)
 runForCombinations(FVParams, runForFVParam)
