@@ -21,7 +21,9 @@ def convertColorspace(img, cs):
 
 
 def procChanDWT(img, wavelet, nLevels):
-    wt = pywt.wavedec2(img, wavelet=wavelet, level=nLevels)
+    wl = pywt.Wavelet(wavelet)
+    nLevels = max(nLevels, pywt.dwt_max_level(256, wl))
+    wt = pywt.wavedec2(img, wavelet=wl, level=nLevels)
     fv = []
     for l in xrange(1, nLevels):
         for x in wt[l]:
