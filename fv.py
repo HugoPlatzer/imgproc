@@ -40,6 +40,20 @@ def procChanSWT(img, wavelet, nLevels):
             fv.append(np.mean(np.abs(x - np.mean(x))))
     return fv
 
+def procChanPacket(img, wavelet, nLevels):
+    wt = pywt.WaveletPacket2D(img, wavelet=wavelet, maxlevel=nLevels)
+    fv = []    
+    wts = wt.decompose()
+    for item in wts:
+        item.walk(lambda node: processPacketNode(node=node, fv=fv))
+    
+    return fv
+
+def processPacketNode(node, fv):
+    x = node.data
+    fv.append(np.std(x))
+    fv.append(np.mean(np.abs(x - np.mean(x))))
+
 def procImg(filename, colorSpace, wavelet, nLevels):
     img = cv2.imread(filename, cv2.IMREAD_COLOR)
     img = convertColorspace(img, colorSpace)
@@ -64,7 +78,7 @@ patientMapping = loadPatientMapping(os.path.join(dataDir, "patientmapping.csv"))
 patternClassMapping = {"Pit Pattern I": "A", "Pit Pattern II": "A",
           "Pit Pattern III L": "B", "Pit Pattern III S": "B",
           "Pit Pattern IV": "B", "Pit Pattern V": "C"}
-transformTypeMapping = {"swt" : procChanSWT, "dwt" : procChanDWT}
+transformTypeMapping = {"swt" : procChanSWT, "dwt" : procChanDWT, "packet" : procChanPacket}
 
 parser = argparse.ArgumentParser()
 parser.add_argument("transformType", choices = transformTypeMapping.keys())
