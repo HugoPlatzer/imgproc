@@ -1,4 +1,4 @@
-import fileinput, ast, re
+import sys, ast, re, argparse
 
 class Result:
     def __init__(self, lines):
@@ -12,7 +12,7 @@ class Result:
 
 def parseInput():
     results, lBuffer = [], []
-    for l in fileinput.input():
+    for l in sys.stdin:
         if l == "\n":
             results.append(Result(lBuffer))
             lBuffer = []
@@ -47,11 +47,11 @@ def emitValues():
             resultRow.append(findResult(p))
         print(" ".join(str(v) for v in resultRow))
 
-params = {'transformType': 'dwt', 'colorSpace': ["Lab", "RGB", "HSV", "YUV"], 'nLevels': '6',
-'waveletFunction': ["haar", "db1", "db10", "db20"], 'k': 1, 'testMethod': 'patient'}
-rowParam = "colorSpace"
-colParam = "waveletFunction"
 
+parser = argparse.ArgumentParser()
+parser.add_argument("paramFile")
+args = parser.parse_args()
+execfile(args.paramFile)
 results = parseInput()
 emitRowColNames()
 emitValues()
