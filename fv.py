@@ -53,6 +53,7 @@ def processPacketNode(node, fv):
     x = node.data
     fv.append(np.std(x))
     fv.append(np.mean(np.abs(x - np.mean(x))))
+    return True
 
 def procImg(filename, colorSpace, wavelet, nLevels):
     img = cv2.imread(filename, cv2.IMREAD_COLOR)
