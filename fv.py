@@ -3,6 +3,7 @@ import pywt
 import numpy as np
 import os
 import argparse
+import dtcwt
 
 def loadPatientMapping(filename):
     d = {}
@@ -37,7 +38,7 @@ def procChanSWT(img, wavelet, nLevels):
     for l in xrange(1, nLevels):
         for x in wt[l][1]:
             fv.append(np.std(x))
-            fv.append(np.mean(np.abs(x - np.mean(x))))
+            fv.append(np.mean(x))
     return fv
 
 def procChanPacket(img, wavelet, nLevels):
@@ -54,6 +55,17 @@ def processPacketNode(node, fv):
     fv.append(np.std(x))
     fv.append(np.mean(np.abs(x - np.mean(x))))
     return True
+
+# currently we only use highpass information with dtcwt because the results seem to be better
+def procChanDTCWT(img, wavelet, nLevels):
+    fv = []
+    transform = dtcwt.Transform2d()
+    wt = transform.forward(img, nlevels=nLevels)
+    for highpass in wt.highpasses:
+            fv.append(np.std(highpass))
+            fv.append(np.mean(np.abs(highpass - np.mean(highpass))))
+    
+    return fv
 
 def procImg(filename, colorSpace, wavelet, nLevels):
     img = cv2.imread(filename, cv2.IMREAD_COLOR)
@@ -79,7 +91,7 @@ patientMapping = loadPatientMapping(os.path.join(dataDir, "patientmapping.csv"))
 patternClassMapping = {"Pit Pattern I": "A", "Pit Pattern II": "A",
           "Pit Pattern III L": "B", "Pit Pattern III S": "B",
           "Pit Pattern IV": "B", "Pit Pattern V": "C"}
-transformTypeMapping = {"swt" : procChanSWT, "dwt" : procChanDWT, "packet" : procChanPacket}
+transformTypeMapping = {"swt" : procChanSWT, "dwt" : procChanDWT, "packet" : procChanPacket, "dtcwt" : procChanDTCWT}
 
 parser = argparse.ArgumentParser()
 parser.add_argument("transformType", choices = transformTypeMapping.keys())
